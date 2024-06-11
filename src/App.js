@@ -1,19 +1,19 @@
 import React from "react";
 import { BrowserRouter as Router, Route, Routes, Link } from "react-router-dom";
-import Home from "./pages/Home";
-import UserRoleRequest from "./pages/UserRoleRequest";
 import { AppBar, Toolbar, Typography, Button } from "@mui/material";
 import { ToastContainer } from "react-toastify";
-import AuthEndpoint from "./endpoints/authEndpoints";
+import Endpoint from "./endpoints";
 import clsx from "clsx";
 import { publicRequest } from "./utils/request";
 import { HttpStatusCode } from "axios";
 import localStorage from "./utils/localStorage";
 import StorageKey from "./constants/storageKeys";
+import ProductCategoryPage from "./pages/ProductCategoryPage";
+import UserRoleRequest from "./pages/UserRoleRequest";
 
 const login = async (data) => {
   try {
-    const response = await publicRequest.post(AuthEndpoint.LOGIN, data);
+    const response = await publicRequest.post(Endpoint.LOGIN, data);
     if (response.status === HttpStatusCode.Ok) {
       const tempUserInfo = response?.data;
       localStorage.setItem(StorageKey.USER_INFOS, JSON.stringify(tempUserInfo));
@@ -47,8 +47,8 @@ const App = () => {
           <Typography variant="h6" style={{ flexGrow: 1 }}>
             User Role Management
           </Typography>
-          <Button color="inherit" component={Link} to="/">
-            Home
+          <Button color="inherit" component={Link} to="/add-category">
+            Categories
           </Button>
           <Button color="inherit" component={Link} to="/user-role-requests">
             New Role Requests
@@ -56,8 +56,8 @@ const App = () => {
         </Toolbar>
       </AppBar>
       <Routes>
-        <Route path="/" element={<Home />} />
         <Route path="/user-role-requests" element={<UserRoleRequest />} />
+        <Route path="/add-category" element={<ProductCategoryPage />} />
       </Routes>
       <ToastContainer
         position="top-center"

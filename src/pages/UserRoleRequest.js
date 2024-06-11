@@ -11,15 +11,26 @@ import {
   CircularProgress,
   Box,
   Button,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogContentText,
+  DialogTitle,
 } from "@mui/material";
 
-import { approveNewRoleRequest, getNewRoleRequests } from "../services/api";
+import {
+  approveNewRoleRequest,
+  rejectNewRoleRequest,
+  getNewRoleRequests,
+} from "../services/api";
 
 const UserRoleRequest = () => {
   const [roles, setRoles] = useState([]);
   const [page, setPage] = useState(0);
   const [loading, setLoading] = useState(false);
   const [hasMore, setHasMore] = useState(false);
+  const [open, setOpen] = useState(false);
+  const [roleToReject, setRoleToReject] = useState(null);
 
   const getRoles = async (slice) => {
     setLoading(true);
@@ -44,6 +55,28 @@ const UserRoleRequest = () => {
     }
   };
 
+  const handleReject = async () => {
+    if (roleToReject) {
+      try {
+        await rejectNewRoleRequest(roleToReject.id);
+        setRoles((prev) => prev.filter((role) => role.id !== roleToReject.id));
+        handleClose();
+      } catch (e) {
+        console.log(e);
+      }
+    }
+  };
+
+  const handleClickOpen = (role) => {
+    setRoleToReject(role);
+    setOpen(true);
+  };
+
+  const handleClose = () => {
+    setOpen(false);
+    setRoleToReject(null);
+  };
+
   useEffect(() => {
     getRoles(page);
   }, [page]);
@@ -60,7 +93,8 @@ const UserRoleRequest = () => {
             <TableCell align="center">Request Role</TableCell>
             <TableCell align="center">Front ID Image</TableCell>
             <TableCell align="center">Back ID Image</TableCell>
-            <TableCell align="center">Actions</TableCell>
+            <TableCell align="center">Approve</TableCell>
+            <TableCell align="center">Reject</TableCell>
           </TableRow>
         </TableHead>
         <TableBody>
@@ -72,10 +106,10 @@ const UserRoleRequest = () => {
               <TableCell>{role.userPhoneNumber}</TableCell>
               <TableCell>{role.role}</TableCell>
               <TableCell>
-                <Avatar src={role.frontIdImage} alt="Front ID Image" />
+                <Avatar src={role.identifyImageFront} alt="Front ID Image" />
               </TableCell>
               <TableCell>
-                <Avatar src={role.backIdImage} alt="Back ID Image" />
+                <Avatar src={role.identifyImageBack} alt="Back ID Image" />
               </TableCell>
               <TableCell align="center">
                 <Button
@@ -86,11 +120,20 @@ const UserRoleRequest = () => {
                   ✓
                 </Button>
               </TableCell>
+              <TableCell align="center">
+                <Button
+                  variant="contained"
+                  color="secondary"
+                  onClick={() => handleClickOpen(role)}
+                >
+                  ✗
+                </Button>
+              </TableCell>
             </TableRow>
           ))}
           {hasMore && (
             <TableRow>
-              <TableCell colSpan={8} align="center">
+              <TableCell colSpan={9} align="center">
                 <Box display="flex" justifyContent="center" alignItems="center">
                   {loading ? (
                     <CircularProgress />
@@ -104,7 +147,7 @@ const UserRoleRequest = () => {
                       }}
                       disabled={loading}
                     >
-                      Generate More
+                      Load More
                     </Button>
                   )}
                 </Box>
@@ -113,6 +156,31 @@ const UserRoleRequest = () => {
           )}
         </TableBody>
       </Table>
+
+      <Dialog
+        open={open}
+        onClose={handleClose}
+        aria-labelledby="alert-dialog-title"
+        aria-describedby="alert-dialog-description"
+      >
+        <DialogTitle id="alert-dialog-title">
+          {"Reject Role Request"}
+        </DialogTitle>
+        <DialogContent>
+          <DialogContentText id="alert-dialog-description">
+            Are you sure you want to reject this role request? This action
+            cannot be undone.
+          </DialogContentText>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={handleClose} color="primary">
+            Cancel
+          </Button>
+          <Button onClick={handleReject} color="secondary" autoFocus>
+            Reject
+          </Button>
+        </DialogActions>
+      </Dialog>
     </TableContainer>
   );
 };

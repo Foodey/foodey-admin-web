@@ -3,7 +3,7 @@ import { APP_NAME } from "../constants/config";
 const localStorage = {
   setItem: (key, value) => {
     try {
-      console.log("setItem", key, value);
+      // console.log("setItem", key, value);
       return window.localStorage.setItem(
         `${APP_NAME}_${key}`,
         JSON.stringify(value),

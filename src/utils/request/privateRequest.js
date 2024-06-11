@@ -2,13 +2,14 @@ import axios from "axios";
 import refreshTokenFn from "./refreshToken";
 import localStorage from "../../utils/localStorage";
 import StorageKey from "../../constants/storageKeys";
-import { toast } from "react-toastify";
 import { SERVER_HOST } from "../../constants/config";
 import HttpStatusCode from "../../constants/httpStatusCode";
 
-axios.defaults.baseURL = SERVER_HOST;
+const privateRequest = axios.create();
 
-axios.interceptors.request.use(
+privateRequest.defaults.baseURL = SERVER_HOST;
+
+privateRequest.interceptors.request.use(
   async (config) => {
     const accessToken = localStorage.getItem(StorageKey.ACCESS_TOKEN);
 
@@ -23,7 +24,7 @@ axios.interceptors.request.use(
   (error) => Promise.reject(error),
 );
 
-axios.interceptors.response.use(
+privateRequest.interceptors.response.use(
   (response) => {
     return response;
   },
@@ -41,16 +42,14 @@ axios.interceptors.response.use(
           ...config.headers,
           Authorization: `Bearer ${newAccessToken}`,
         };
-        return axios(config);
+        return privateRequest(config);
       }
       //logout without sending the refresh token back to server
-      toast.warn("Session expired. Please login again.");
+      // toast.warn("Session expired. Please login again.");
       return Promise.reject(error);
     }
     return Promise.reject(error);
   },
 );
-
-const privateRequest = axios;
 
 export default privateRequest;

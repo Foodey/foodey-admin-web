@@ -1,6 +1,6 @@
 import publicRequest from "./publicRequest";
 import localStorage from "../localStorage";
-import AuthEndpoint from "../../endpoints/authEndpoints";
+import Endpoint from "../../endpoints";
 import StorageKey from "../../constants/storageKeys";
 
 const refreshTokenFn = async () => {
@@ -18,19 +18,19 @@ const refreshTokenFn = async () => {
 
   try {
     const response = await publicRequest.post(
-      AuthEndpoint.REFRESH_TOKEN,
+      Endpoint.REFRESH_TOKEN,
       null,
       config,
     );
 
-    const { accessToken: newAccessToken, refreshToken: newRefreshToken } =
-      response.data;
+    const newAccessToken = response.data.accessToken;
+    const newRefreshToken = response.data.refreshToken;
 
     localStorage.setItem(StorageKey.REFRESH_TOKEN, newRefreshToken);
     localStorage.setItem(StorageKey.ACCESS_TOKEN, newAccessToken);
     return newAccessToken;
   } catch (error) {
-    console.log("ERROR HERE");
+    console.log("Error when refreshing token:", error);
     localStorage.removeItem(StorageKey.REFRESH_TOKEN);
     localStorage.removeItem(StorageKey.ACCESS_TOKEN);
     return null;
