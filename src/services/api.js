@@ -1,5 +1,17 @@
-import { privateRequest } from "../utils/request";
+import StorageKey from "../constants/storageKeys";
 import Endpoint from "../endpoints";
+import { HttpStatusCode } from "axios";
+import localStorage from "../utils/localStorage";
+import { toast } from "react-toastify";
+import { privateRequest, publicRequest } from "../utils/request";
+
+export const login = async (phoneNumber, password) => {
+  const response = await publicRequest.post(Endpoint.LOGIN, {
+    phoneNumber,
+    password,
+  });
+  return response;
+};
 
 export const approveNewRoleRequest = async (requestId) => {
   try {
@@ -37,7 +49,7 @@ export const getNewRoleRequests = async (
     });
     return response.data;
   } catch (error) {
-    console.error("There was an error fetching the new role requests!", error);
+    console.log("Failed to load roles:", error);
     throw error;
   }
 };
@@ -69,5 +81,15 @@ export const deleteProductCategory = async (categoryId) => {
   const response = await privateRequest.delete(
     Endpoint.DELETE_CATEGORIES(categoryId),
   );
+  return response.data;
+};
+
+export const getVouchers = async () => {
+  const response = await publicRequest.get(Endpoint.GET_VOUCHERS);
+  return response.data;
+};
+
+export const addVoucher = async (voucher) => {
+  const response = await publicRequest.post(Endpoint.ADD_VOUCHER, voucher);
   return response.data;
 };

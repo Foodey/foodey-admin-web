@@ -1,15 +1,20 @@
+import { ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 import React from "react";
 import { BrowserRouter as Router, Route, Routes, Link } from "react-router-dom";
-import { AppBar, Toolbar, Typography, Button } from "@mui/material";
-import { ToastContainer } from "react-toastify";
-import Endpoint from "./endpoints";
 import clsx from "clsx";
+import { AppBar, Toolbar, Typography, Button } from "@mui/material";
+import Endpoint from "./endpoints";
 import { publicRequest } from "./utils/request";
 import { HttpStatusCode } from "axios";
 import localStorage from "./utils/localStorage";
 import StorageKey from "./constants/storageKeys";
+
+// pages
+import VoucherPage from "./pages/VoucherPage";
 import ProductCategoryPage from "./pages/ProductCategoryPage";
 import UserRoleRequest from "./pages/UserRoleRequest";
+import LoginPage from "./pages/LoginPage";
 
 const login = async (data) => {
   try {
@@ -47,17 +52,25 @@ const App = () => {
           <Typography variant="h6" style={{ flexGrow: 1 }}>
             User Role Management
           </Typography>
-          <Button color="inherit" component={Link} to="/add-category">
+          <Button color="inherit" component={Link} to="/vouchers">
+            Vouchers
+          </Button>
+          <Button color="inherit" component={Link} to="/categories">
             Categories
           </Button>
           <Button color="inherit" component={Link} to="/user-role-requests">
             New Role Requests
           </Button>
+          {/* <Button color="inherit" component={Link} to="/login"> */}
+          {/*   Login */}
+          {/* </Button> */}
         </Toolbar>
       </AppBar>
       <Routes>
+        <Route path="/vouchers" element={<VoucherPage />} />
         <Route path="/user-role-requests" element={<UserRoleRequest />} />
-        <Route path="/add-category" element={<ProductCategoryPage />} />
+        <Route path="/categories" element={<ProductCategoryPage />} />
+        <Route path="/login" element={<LoginPage />} />
       </Routes>
       <ToastContainer
         position="top-center"

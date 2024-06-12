@@ -10,6 +10,9 @@ const Endpoint = {
   GET_CATEGORIES: "/v1/product-categories",
   ADD_CATEGORIES: "/v1/product-categories",
   DELETE_CATEGORIES: (categoryId) => "/v1/product-categories/" + categoryId,
+
+  GET_VOUCHERS: "/v1/products",
+  ADD_VOUCHER: "/v1/products",
 };
 
 export default Endpoint;
