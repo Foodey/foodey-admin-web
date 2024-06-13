@@ -45,7 +45,6 @@ privateRequest.interceptors.response.use(
         return privateRequest(config);
       }
       //logout without sending the refresh token back to server
-      // toast.warn("Session expired. Please login again.");
       return Promise.reject(error);
     }
     return Promise.reject(error);

@@ -11,8 +11,8 @@ const Endpoint = {
   ADD_CATEGORIES: "/v1/product-categories",
   DELETE_CATEGORIES: (categoryId) => "/v1/product-categories/" + categoryId,
 
-  GET_VOUCHERS: "/v1/products",
-  ADD_VOUCHER: "/v1/products",
+  GET_VOUCHERS: "/v1/vouchers",
+  ADD_VOUCHER: "/v1/vouchers",
 };
 
 export default Endpoint;

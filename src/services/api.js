@@ -1,8 +1,4 @@
-import StorageKey from "../constants/storageKeys";
 import Endpoint from "../endpoints";
-import { HttpStatusCode } from "axios";
-import localStorage from "../utils/localStorage";
-import { toast } from "react-toastify";
 import { privateRequest, publicRequest } from "../utils/request";
 
 export const login = async (phoneNumber, password) => {
@@ -23,7 +19,6 @@ export const approveNewRoleRequest = async (requestId) => {
 };
 
 export const rejectNewRoleRequest = async (requestId) => {
-  // Add this function
   try {
     await privateRequest.delete(Endpoint.REJECT_NEW_ROLE_REQUEST(requestId));
   } catch (error) {
@@ -85,11 +80,12 @@ export const deleteProductCategory = async (categoryId) => {
 };
 
 export const getVouchers = async () => {
-  const response = await publicRequest.get(Endpoint.GET_VOUCHERS);
+  const response = await privateRequest.get(Endpoint.GET_VOUCHERS);
+  console.log(response.data);
   return response.data;
 };
 
 export const addVoucher = async (voucher) => {
-  const response = await publicRequest.post(Endpoint.ADD_VOUCHER, voucher);
+  const response = await privateRequest.post(Endpoint.ADD_VOUCHER, voucher);
   return response.data;
 };

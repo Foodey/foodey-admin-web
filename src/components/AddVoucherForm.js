@@ -1,13 +1,6 @@
 import React, { useState } from "react";
 import { addVoucher } from "../services/api";
-import {
-  TextField,
-  Button,
-  Box,
-  Typography,
-  MenuItem,
-  Grid,
-} from "@mui/material";
+import { TextField, Button, Box, Typography, MenuItem } from "@mui/material";
 import { toast } from "react-toastify";
 
 const voucherMethods = ["PERCENTAGE", "SPECIAL_AMOUNT"];
@@ -22,13 +15,13 @@ const AddVoucherForm = () => {
     discountAmount: 0,
     activationDate: "",
     expiryDate: "",
-    method: "",
-    type: "",
+    method: voucherMethods[0],
+    type: voucherTypes[0],
     shopVsBrandId: "",
     appliedCategoryIds: "",
     appliedProductIds: "",
     minimumBuyingQuantity: 1,
-    minimumDistanceFromStore: 0,
+    minimumDistanceFromStore: 5,
   });
 
   const [errors, setErrors] = useState({});
@@ -39,14 +32,10 @@ const AddVoucherForm = () => {
 
   const validate = () => {
     let tempErrors = {};
-    tempErrors.code = voucher.code ? "" : "Code is required";
+    // tempErrors.code = voucher.code ? "" : "Code is required";
     tempErrors.name = voucher.name ? "" : "Name is required";
     tempErrors.discountAmount =
       voucher.discountAmount > 0 ? "" : "Discount Amount is required";
-    tempErrors.activationDate = voucher.activationDate
-      ? ""
-      : "Activation Date is required";
-    tempErrors.expiryDate = voucher.expiryDate ? "" : "Expiry Date is required";
     tempErrors.method = voucher.method ? "" : "Method is required";
     tempErrors.type = voucher.type ? "" : "Type is required";
     tempErrors.minimumBuyingQuantity =
@@ -61,11 +50,32 @@ const AddVoucherForm = () => {
     return Object.values(tempErrors).every((x) => x === "");
   };
 
+  const cleanVoucher = (voucher) => {
+    const cleanedVoucher = { ...voucher };
+    Object.keys(cleanedVoucher).forEach((key) => {
+      if (cleanedVoucher[key] === "") {
+        cleanedVoucher[key] = null;
+      }
+    });
+    if (cleanedVoucher.appliedProductIds) {
+      cleanedVoucher.appliedProductIds = cleanedVoucher.appliedProductIds
+        .split(",")
+        .map((id) => id.trim());
+    }
+    if (cleanedVoucher.appliedCategoryIds) {
+      cleanedVoucher.appliedCategoryIds = cleanedVoucher.appliedCategoryIds
+        .split(",")
+        .map((id) => id.trim());
+    }
+    return cleanedVoucher;
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (validate()) {
       try {
-        await addVoucher(voucher);
+        const cleanedVoucher = cleanVoucher(voucher);
+        await addVoucher(cleanedVoucher);
         toast.success("Voucher added successfully");
         setVoucher({
           code: "",
@@ -100,7 +110,7 @@ const AddVoucherForm = () => {
       <Box
         component="form"
         onSubmit={handleSubmit}
-        sx={{ "& > :not(style)": { mb: 2 } }} // Adjust spacing between fields
+        sx={{ "& > :not(style)": { mb: 2 } }}
       >
         <TextField
           label="Code"
@@ -108,8 +118,6 @@ const AddVoucherForm = () => {
           value={voucher.code}
           onChange={handleChange}
           fullWidth
-          error={!!errors.code}
-          helperText={errors.code}
         />
         <TextField
           label="Name"
@@ -152,8 +160,6 @@ const AddVoucherForm = () => {
           type="date"
           InputLabelProps={{ shrink: true }}
           fullWidth
-          error={!!errors.activationDate}
-          helperText={errors.activationDate}
         />
         <TextField
           label="Expiry Date"
@@ -163,8 +169,6 @@ const AddVoucherForm = () => {
           type="date"
           InputLabelProps={{ shrink: true }}
           fullWidth
-          error={!!errors.expiryDate}
-          helperText={errors.expiryDate}
         />
         <TextField
           select
