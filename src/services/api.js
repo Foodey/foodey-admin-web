@@ -63,7 +63,6 @@ export const getProductCategories = async (
       direction,
     },
   });
-  console.log("response", response.data);
   return response.data;
 };
 

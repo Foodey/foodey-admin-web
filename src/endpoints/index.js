@@ -10,6 +10,7 @@ const Endpoint = {
   GET_CATEGORIES: "/v1/product-categories",
   ADD_CATEGORIES: "/v1/product-categories",
   DELETE_CATEGORIES: (categoryId) => "/v1/product-categories/" + categoryId,
+  IMAGE_UPLOAD_API_OPTIONS: "/v1/product-categories/image-upload-api-options",
 
   GET_VOUCHERS: "/v1/vouchers",
   ADD_VOUCHER: "/v1/vouchers",

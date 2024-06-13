@@ -1,4 +1,3 @@
-// src/components/AddCategoryForm.js
 import React, { useState } from "react";
 import {
   TextField,
@@ -6,17 +5,28 @@ import {
   Box,
   Typography,
   CircularProgress,
+  InputLabel,
 } from "@mui/material";
 import { addProductCategory } from "../services/api";
-import { HttpStatusCode } from "axios";
+import cldUpload from "../services/cloudinary";
 
 const AddCategoryForm = ({ onCategoryAdded }) => {
   const [name, setName] = useState("");
   const [description, setDescription] = useState("");
-  const [urlImage, setUrlImage] = useState("");
+  const [urlImage, setUrlImage] = useState(null); // Changed to store file
   const [loading, setLoading] = useState(false);
   const [success, setSuccess] = useState(null);
   const [error, setError] = useState(null);
+
+  const handleUploadImage = async (file, params) => {
+    try {
+      const response = await cldUpload(urlImage, params);
+      return response.data.secure_url;
+    } catch (error) {
+      console.log(error);
+      throw new Error("Failed to upload image");
+    }
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -25,26 +35,32 @@ const AddCategoryForm = ({ onCategoryAdded }) => {
     setError(null);
 
     try {
-      const result = await addProductCategory({
+      const newProductCategory = await addProductCategory({
         name,
         description,
-        image: urlImage,
       });
+
+      if (urlImage) {
+        await handleUploadImage(
+          urlImage,
+          newProductCategory.cldImageUploadApiOptions,
+        );
+      }
+
       setSuccess("Category added successfully!");
       setName("");
       setDescription("");
-      onCategoryAdded(result); // Call the callback to update categories
+      setUrlImage(null); // Clear the file input
+      onCategoryAdded(newProductCategory); // Call the callback to update categories
     } catch (error) {
-      switch (error.response.data.code) {
-        case HttpStatusCode.Conflict:
-          setError("Category already exists");
-          break;
-        default:
-          setError("An error occurred while adding the category");
-      }
+      setError(error.message || "An error occurred while adding the category");
     } finally {
       setLoading(false);
     }
+  };
+
+  const handleImageChange = (e) => {
+    setUrlImage(e.target.files[0]);
   };
 
   return (
@@ -84,15 +100,16 @@ const AddCategoryForm = ({ onCategoryAdded }) => {
         value={description}
         onChange={(e) => setDescription(e.target.value)}
       />
-      <TextField
-        margin="normal"
-        fullWidth
+      <InputLabel htmlFor="urlImage" style={{ marginTop: "16px" }}>
+        Image URL
+      </InputLabel>
+      <input
         id="urlImage"
-        label="Image URL"
         name="urlImage"
-        autoComplete="urlImage"
-        value={urlImage}
-        onChange={(e) => setUrlImage(e.target.value)}
+        type="file"
+        accept="image/*"
+        style={{ display: "block", marginTop: "8px", marginBottom: "16px" }}
+        onChange={handleImageChange}
       />
       <Button
         type="submit"
