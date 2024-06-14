@@ -1,5 +1,5 @@
 const Endpoint = {
-  REFRESH_TOKEN: "/v1/api/auth/refresh-token",
+  REFRESH_TOKEN: "/v1/auth/refresh-token",
   LOGIN: "/v1/auth/login",
   REJECT_NEW_ROLE_REQUEST: (requestId) =>
     "/v1/admin/approval/roles/" + requestId,

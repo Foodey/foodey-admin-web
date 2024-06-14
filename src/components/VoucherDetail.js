@@ -8,9 +8,19 @@ import {
   DialogActions,
   Button,
   Grid,
+  CardMedia,
 } from "@mui/material";
 
 const VoucherDetail = ({ voucher, open, onClose }) => {
+  const defaultImage =
+    "https://t4.ftcdn.net/jpg/04/73/25/49/360_F_473254957_bxG9yf4ly7OBO5I0O5KABlN930GwaMQz.jpg"; // Default image URL
+
+  const handleImageError = (e) => {
+    e.preventDefault();
+    e.target.onerror = null;
+    e.target.src = defaultImage;
+  };
+
   return (
     <Dialog open={open} onClose={onClose} fullWidth maxWidth="md">
       <DialogTitle>Voucher Details</DialogTitle>
@@ -33,11 +43,19 @@ const VoucherDetail = ({ voucher, open, onClose }) => {
           </Grid>
           {voucher.image && (
             <Grid item xs={12}>
-              <img
-                src={voucher.image}
+              <CardMedia
+                component="img"
+                height="140"
+                image={voucher.image}
                 alt={voucher.name}
-                style={{ width: "100%", height: "auto", borderRadius: "8px" }}
+                onError={handleImageError} // Add onError handler
+                loading="lazy"
               />
+              {/* <img */}
+              {/*   src={voucher.image} */}
+              {/*   alt={voucher.name} */}
+              {/*   style={{ width: "100%", height: "auto", borderRadius: "8px" }} */}
+              {/* /> */}
             </Grid>
           )}
           <Grid item xs={12} sm={6}>

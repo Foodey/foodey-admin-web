@@ -8,7 +8,6 @@ import {
 } from "@mui/material";
 import { login } from "../services/api";
 import { HttpStatusCode } from "axios";
-// import Endpoint from "../endpoints";
 import localStorage from "../utils/localStorage";
 import StorageKey from "../constants/storageKeys";
 import { toast } from "react-toastify";
@@ -65,16 +64,6 @@ const LoginForm = () => {
     } finally {
       setLoading(false);
     }
-
-    // try {
-    //   const response = await login(phoneNumber, password);
-    //   console.log("Login successful", response);
-    //   // Thực hiện hành động sau khi đăng nhập thành công, ví dụ như lưu token hoặc chuyển hướng
-    // } catch (error) {
-    //   setError("Login failed");
-    // } finally {
-    //   setLoading(false);
-    // }
   };
 
   return (

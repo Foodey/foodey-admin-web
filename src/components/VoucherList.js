@@ -79,8 +79,8 @@ const VoucherList = () => {
             </TableRow>
           </TableHead>
           <TableBody>
-            {vouchers.map((voucher) => (
-              <TableRow key={voucher.id}>
+            {vouchers.map((voucher, index) => (
+              <TableRow key={index}>
                 <TableCell>{voucher.code}</TableCell>
                 <TableCell>{voucher.name}</TableCell>
                 <TableCell>{voucher.discountAmount}</TableCell>

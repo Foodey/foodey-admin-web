@@ -99,7 +99,7 @@ const UserRoleRequest = () => {
         </TableHead>
         <TableBody>
           {roles.map((role, index) => (
-            <TableRow key={role.id}>
+            <TableRow key={index}>
               <TableCell>{index + 1}</TableCell>
               <TableCell>{role.userId}</TableCell>
               <TableCell>{role.userName}</TableCell>

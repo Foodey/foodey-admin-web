@@ -21,7 +21,6 @@ const login = async (data) => {
     const response = await publicRequest.post(Endpoint.LOGIN, data);
     if (response.status === HttpStatusCode.Ok) {
       const tempUserInfo = response?.data;
-      localStorage.setItem(StorageKey.USER_INFOS, JSON.stringify(tempUserInfo));
       localStorage.setItem(
         StorageKey.ACCESS_TOKEN,
         tempUserInfo.jwt.accessToken,

@@ -19,7 +19,7 @@ const refreshTokenFn = async () => {
   try {
     const response = await publicRequest.post(
       Endpoint.REFRESH_TOKEN,
-      null,
+      {},
       config,
     );
 
@@ -31,8 +31,6 @@ const refreshTokenFn = async () => {
     return newAccessToken;
   } catch (error) {
     console.log("Error when refreshing token:", error);
-    localStorage.removeItem(StorageKey.REFRESH_TOKEN);
-    localStorage.removeItem(StorageKey.ACCESS_TOKEN);
     return null;
   }
 };

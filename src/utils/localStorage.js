@@ -4,6 +4,7 @@ const localStorage = {
   setItem: (key, value) => {
     try {
       // console.log("setItem", key, value);
+      console.log(value);
       return window.localStorage.setItem(
         `${APP_NAME}_${key}`,
         JSON.stringify(value),
@@ -14,7 +15,11 @@ const localStorage = {
   },
   getItem: (key) => {
     try {
-      return JSON.parse(window.localStorage.getItem(`${APP_NAME}_${key}`));
+      const item = JSON.parse(
+        window.localStorage.getItem(`${APP_NAME}_${key}`),
+      );
+      console.log("getItem", key, item);
+      return item;
     } catch (error) {
       console.log("getItem error", error);
     }

@@ -1,7 +1,18 @@
 import React, { useState } from "react";
 import { addVoucher } from "../services/api";
-import { TextField, Button, Box, Typography, MenuItem } from "@mui/material";
+import {
+  TextField,
+  Button,
+  Box,
+  Typography,
+  MenuItem,
+  CircularProgress,
+  InputLabel,
+} from "@mui/material";
 import { toast } from "react-toastify";
+import styled from "@emotion/styled";
+import { HttpStatusCode } from "axios";
+import cldUpload from "../services/cloudinary";
 
 const voucherMethods = ["PERCENTAGE", "SPECIAL_AMOUNT"];
 const voucherTypes = ["PRODUCT", "CATEGORY"];
@@ -11,7 +22,7 @@ const AddVoucherForm = () => {
     code: "",
     name: "",
     description: "",
-    image: "",
+    image: null,
     discountAmount: 0,
     activationDate: "",
     expiryDate: "",
@@ -25,14 +36,18 @@ const AddVoucherForm = () => {
   });
 
   const [errors, setErrors] = useState({});
+  const [loading, setLoading] = useState(false);
 
   const handleChange = (e) => {
-    setVoucher({ ...voucher, [e.target.name]: e.target.value });
+    if (e.target.name === "image") {
+      setVoucher({ ...voucher, image: e.target.files[0] });
+    } else {
+      setVoucher({ ...voucher, [e.target.name]: e.target.value });
+    }
   };
 
   const validate = () => {
     let tempErrors = {};
-    // tempErrors.code = voucher.code ? "" : "Code is required";
     tempErrors.name = voucher.name ? "" : "Name is required";
     tempErrors.discountAmount =
       voucher.discountAmount > 0 ? "" : "Discount Amount is required";
@@ -49,7 +64,6 @@ const AddVoucherForm = () => {
     setErrors(tempErrors);
     return Object.values(tempErrors).every((x) => x === "");
   };
-
   const cleanVoucher = (voucher) => {
     const cleanedVoucher = { ...voucher };
     Object.keys(cleanedVoucher).forEach((key) => {
@@ -70,32 +84,55 @@ const AddVoucherForm = () => {
     return cleanedVoucher;
   };
 
+  const handleUploadImage = async (file, params) => {
+    try {
+      const response = await cldUpload(file, params);
+      return response.data.secure_url;
+    } catch (error) {
+      console.log(error);
+      throw new Error("Failed to upload image");
+    }
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (validate()) {
+      setLoading(true);
       try {
         const cleanedVoucher = cleanVoucher(voucher);
-        await addVoucher(cleanedVoucher);
+        const newVoucher = await addVoucher(cleanedVoucher);
+
+        await handleUploadImage(
+          voucher.image,
+          newVoucher.imageApiUploadOptions,
+        );
+
         toast.success("Voucher added successfully");
         setVoucher({
           code: "",
           name: "",
           description: "",
-          image: "",
+          image: null,
           discountAmount: 0,
           activationDate: "",
           expiryDate: "",
-          method: "",
-          type: "",
+          method: voucherMethods[0],
+          type: voucherTypes[0],
           shopVsBrandId: "",
           appliedCategoryIds: "",
           appliedProductIds: "",
           minimumBuyingQuantity: 1,
-          minimumDistanceFromStore: 0,
+          minimumDistanceFromStore: 5,
         });
         setErrors({});
       } catch (err) {
-        toast.error("Failed to add voucher");
+        if (err.response.data.status === HttpStatusCode.Conflict)
+          toast.error("Voucher code already exists");
+        else {
+          toast.error("Failed to add voucher");
+        }
+      } finally {
+        setLoading(false);
       }
     } else {
       toast.warning("Please fill all required fields");
@@ -135,13 +172,29 @@ const AddVoucherForm = () => {
           onChange={handleChange}
           fullWidth
         />
-        <TextField
-          label="Image"
-          name="image"
-          value={voucher.image}
-          onChange={handleChange}
-          fullWidth
-        />
+        <InputLabel htmlFor="imageInput">Image</InputLabel>
+        <ImageInputBox>
+          <input
+            id="imageInput"
+            name="image"
+            type="file"
+            accept="image/*"
+            onChange={handleChange}
+            style={{ display: "none" }}
+          />
+          <label htmlFor="imageInput">
+            {voucher.image ? (
+              <Typography>{voucher.image.name}</Typography>
+            ) : (
+              <Typography>Select Image...</Typography>
+            )}
+          </label>
+        </ImageInputBox>
+        {errors.image && (
+          <Typography variant="caption" color="error">
+            {errors.image}
+          </Typography>
+        )}
         <TextField
           label="Discount Amount"
           name="discountAmount"
@@ -243,12 +296,36 @@ const AddVoucherForm = () => {
           error={!!errors.minimumDistanceFromStore}
           helperText={errors.minimumDistanceFromStore}
         />
-        <Button type="submit" variant="contained" color="primary" fullWidth>
-          Add Voucher
+        <Button
+          type="submit"
+          variant="contained"
+          color="primary"
+          fullWidth
+          disabled={loading}
+        >
+          {loading ? <CircularProgress size={24} /> : "Add Voucher"}
         </Button>
       </Box>
     </Box>
   );
 };
+
+const ImageInputBox = styled(Box)`
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  padding: 8px;
+  display: flex;
+  align-items: center;
+
+  label {
+    cursor: pointer;
+    flex: 1;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100%;
+    min-height: 36px;
+  }
+`;
 
 export default AddVoucherForm;
