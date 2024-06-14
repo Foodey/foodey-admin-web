@@ -17,7 +17,7 @@ import cldUpload from "../services/cloudinary";
 const voucherMethods = ["PERCENTAGE", "SPECIAL_AMOUNT"];
 const voucherTypes = ["PRODUCT", "CATEGORY"];
 
-const AddVoucherForm = () => {
+const AddVoucherForm = ({ onVoucherAdded }) => {
   const [voucher, setVoucher] = useState({
     code: "",
     name: "",
@@ -49,6 +49,7 @@ const AddVoucherForm = () => {
   const validate = () => {
     let tempErrors = {};
     tempErrors.name = voucher.name ? "" : "Name is required";
+    tempErrors.image = voucher.image ? "" : "Image is required";
     tempErrors.discountAmount =
       voucher.discountAmount > 0 ? "" : "Discount Amount is required";
     tempErrors.method = voucher.method ? "" : "Method is required";
@@ -64,6 +65,7 @@ const AddVoucherForm = () => {
     setErrors(tempErrors);
     return Object.values(tempErrors).every((x) => x === "");
   };
+
   const cleanVoucher = (voucher) => {
     const cleanedVoucher = { ...voucher };
     Object.keys(cleanedVoucher).forEach((key) => {
@@ -107,7 +109,10 @@ const AddVoucherForm = () => {
           newVoucher.imageApiUploadOptions,
         );
 
+        onVoucherAdded(newVoucher);
+
         toast.success("Voucher added successfully");
+
         setVoucher({
           code: "",
           name: "",
@@ -191,8 +196,8 @@ const AddVoucherForm = () => {
           </label>
         </ImageInputBox>
         {errors.image && (
-          <Typography variant="caption" color="error">
-            {errors.image}
+          <Typography color="error" sx={{ mt: 1 }}>
+            Image is required.
           </Typography>
         )}
         <TextField

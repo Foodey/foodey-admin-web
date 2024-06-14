@@ -50,6 +50,10 @@ const VoucherList = () => {
     setOpenDetails(false);
   };
 
+  const handleVoucherAdded = (voucher) => {
+    setVouchers((prevVouchers) => [voucher, ...prevVouchers]);
+  };
+
   return (
     <Box mb={4}>
       <Button
@@ -60,7 +64,7 @@ const VoucherList = () => {
       >
         {showAddForm ? "Hide Add Voucher Form" : "Show Add Voucher Form"}
       </Button>
-      {showAddForm && <AddVoucherForm />}
+      {showAddForm && <AddVoucherForm onVoucherAdded={handleVoucherAdded} />}
       <Typography variant="h5" gutterBottom>
         Voucher List
       </Typography>
